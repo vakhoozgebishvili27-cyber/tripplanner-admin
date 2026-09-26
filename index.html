@@ -49,7 +49,24 @@ input,textarea,select{width:100%;border:1px solid #35515d;background:#10232c;col
         <div class="field"><label>სახელი ქართულად *</label><input id="nameKa" placeholder="მაგ. ანანურის ციხე"></div>
         <div class="field"><label>სახელი ინგლისურად</label><input id="nameEn" placeholder="Ananuri Fortress"></div>
         <div class="field"><label>კატეგორია *</label><select id="category">
-          <option value="viewpoint">ბუნება / ხედები</option><option value="historic">ღირსშესანიშნაობა / ისტორია</option><option value="fishing">თევზაობა</option><option value="camping">კემპინგი / საინტერესო ადგილი</option><option value="food">საჭმელი / რესტორანი</option>
+          <option value="viewpoint">ბუნება / ხედები</option>
+          <option value="historic">ღირსშესანიშნაობა / ისტორია</option>
+          <option value="fishing">თევზაობა</option>
+          <option value="camping">კემპინგი</option>
+          <option value="food">საჭმელი / რესტორანი</option>
+          <option value="picnic">პიკნიკი</option>
+          <option value="nature">ბუნება</option>
+          <option value="waterfall">ჩანჩქერი</option>
+          <option value="lake">ტბა</option>
+          <option value="monastery">მონასტერი / ეკლესია</option>
+          <option value="castle">ციხე / სასახლე</option>
+          <option value="cave">მღვიმე</option>
+          <option value="museum">მუზეუმი</option>
+          <option value="hotel">სასტუმრო</option>
+          <option value="gas_station">ბენზინგასამართი</option>
+          <option value="rest_area">დასასვენებელი ადგილი</option>
+          <option value="beach">პლაჟი</option>
+          <option value="winery">მარანი / ღვინო</option>
         </select></div>
         <div class="coords"><div class="field"><label>Latitude *</label><input id="lat" type="number" step="any"></div><div class="field"><label>Longitude *</label><input id="lng" type="number" step="any"></div></div>
         <div class="field"><label>აღწერა</label><textarea id="description" placeholder="მოკლე აღწერა..."></textarea></div>
@@ -85,7 +102,7 @@ let sb=null,map=null,marker=null,editingId=null,placesCache=[];
 function msg(el,t,err=false){el.textContent=t||'';el.style.color=err?'#ff909b':'#9fb0b7'}
 function validConfig(){return cfg.supabaseUrl&&cfg.supabaseAnonKey&&cfg.mapboxToken&&!cfg.supabaseUrl.includes('PASTE_')&&!cfg.supabaseAnonKey.includes('PASTE_')&&!cfg.mapboxToken.includes('PASTE_')}
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function cat(v){return {viewpoint:'ბუნება',historic:'ისტორია',fishing:'თევზაობა',camping:'კემპინგი',food:'საჭმელი'}[v]||v}
+function cat(v){return {viewpoint:'ხედები',historic:'ისტორია',fishing:'თევზაობა',camping:'კემპინგი',food:'საჭმელი',picnic:'პიკნიკი',nature:'ბუნება',waterfall:'ჩანჩქერი',lake:'ტბა',monastery:'მონასტერი',castle:'ციხე',cave:'მღვიმე',museum:'მუზეუმი',hotel:'სასტუმრო',gas_station:'ბენზინგასამართი',rest_area:'დასასვენებელი ადგილი',beach:'პლაჟი',winery:'მარანი'}[v]||v}
 
 async function init(){
   if(!validConfig()){msg($('loginStatus'),'ჯერ შეავსე config.js — Supabase URL, anon key და Mapbox token.',true);$('loginBtn').disabled=true;return}
