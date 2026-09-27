@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Trip Planner Admin</title>
+<title>Trip Planner Admin v3</title>
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js"></script>
@@ -20,7 +20,7 @@ input,textarea,select{width:100%;border:1px solid #35515d;background:#10232c;col
 .shell{display:grid;grid-template-columns:380px minmax(0,1fr);min-height:calc(100vh - 66px)}.sidebar{border-right:1px solid var(--line);background:#09171e;padding:16px;overflow:auto}.map-wrap{position:relative;min-height:calc(100vh - 66px)}#map{position:absolute;inset:0}
 .section{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:14px}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.coords{display:grid;grid-template-columns:1fr 1fr;gap:8px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.status{font-size:12px;color:var(--muted);min-height:16px;margin-top:8px}
 .list{display:flex;flex-direction:column;gap:8px;max-height:410px;overflow:auto;margin-top:10px}.place{background:#10232c;border:1px solid #2d4854;border-radius:14px;padding:11px;cursor:pointer}.place-title{font-weight:800}.meta{font-size:11px;color:var(--muted);margin-top:4px}.tag{display:inline-block;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:800;margin-top:7px;background:#14372d;color:#baf3da}
-.map-hint{position:absolute;left:14px;top:14px;z-index:5;background:rgba(7,19,26,.9);border:1px solid #2c4a56;border-radius:14px;padding:10px 12px;font-size:12px}.map-search{position:absolute;right:14px;top:14px;z-index:5;width:min(390px,calc(100% - 28px));display:flex;gap:8px}.map-search input{background:rgba(9,24,32,.95)}.resultbox{position:absolute;right:14px;top:70px;z-index:6;width:min(390px,calc(100% - 28px));display:flex;flex-direction:column;gap:6px}.result{background:rgba(9,24,32,.97);border:1px solid #33515e;border-radius:12px;padding:9px 11px;cursor:pointer;font-size:12px}.badge{position:absolute;right:16px;bottom:16px;z-index:5;background:rgba(9,24,32,.95);border:1px solid #33515e;border-radius:14px;padding:9px 11px;font-size:11px}
+.map-hint{position:absolute;left:14px;top:14px;z-index:5;background:rgba(7,19,26,.9);border:1px solid #2c4a56;border-radius:14px;padding:10px 12px;font-size:12px}.map-search{position:absolute;right:14px;top:14px;z-index:5;width:min(390px,calc(100% - 28px));display:flex;gap:8px}.map-search input{background:rgba(9,24,32,.95)}.resultbox{position:absolute;right:14px;top:70px;z-index:6;width:min(390px,calc(100% - 28px));display:flex;flex-direction:column;gap:6px}.result{background:rgba(9,24,32,.97);border:1px solid #33515e;border-radius:12px;padding:9px 11px;cursor:pointer;font-size:12px}.badge{position:absolute;right:16px;bottom:16px;z-index:5;background:rgba(9,24,32,.95);border:1px solid #33515e;border-radius:14px;padding:9px 11px;font-size:11px}.image-upload{border:1px dashed #3b5965;border-radius:14px;padding:12px;background:#0d2028}.image-upload input[type=file]{padding:8px;background:#0b1b22}.image-preview{margin-top:10px;width:100%;height:150px;border-radius:12px;overflow:hidden;background:#091820;border:1px solid #294651;display:none}.image-preview.show{display:block}.image-preview img{width:100%;height:100%;object-fit:cover;display:block}.image-actions{display:flex;gap:8px;margin-top:8px}.tiny{padding:8px 10px;font-size:11px}
 @media(max-width:900px){.shell{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid var(--line)}.map-wrap{min-height:520px}.map-hint{display:none}}
 </style>
 </head>
@@ -70,7 +70,7 @@ input,textarea,select{width:100%;border:1px solid #35515d;background:#10232c;col
         </select></div>
         <div class="coords"><div class="field"><label>Latitude *</label><input id="lat" type="number" step="any"></div><div class="field"><label>Longitude *</label><input id="lng" type="number" step="any"></div></div>
         <div class="field"><label>აღწერა</label><textarea id="description" placeholder="მოკლე აღწერა..."></textarea></div>
-        <div class="field"><label>სურათის URL</label><input id="imageUrl" placeholder="https://..."></div>
+        <div class="field"><label>სურათი</label><div class="image-upload"><input id="imageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><div id="imagePreview" class="image-preview"><img id="imagePreviewImg" alt="Selected place image"></div><div class="image-actions"><button id="removeImageBtn" type="button" class="btn secondary tiny">სურათის წაშლა</button></div><div class="sub" style="margin-top:8px">აირჩიე JPG, PNG ან WebP. მაქს. 8 MB.</div></div></div>
         <div class="row"><div class="field"><label>გაჩერების დრო (წუთი)</label><input id="durationMin" type="number" min="0" value="45"></div><div class="field"><label>რეიტინგი</label><input id="rating" type="number" min="0" max="5" step="0.1" value="4.5"></div></div>
         <div class="field"><label>აქტიური?</label><select id="active"><option value="true">კი</option><option value="false">არა</option></select></div>
         <div class="toolbar"><button id="saveBtn" class="btn primary">შენახვა</button><button id="clearBtn" class="btn secondary">გასუფთავება</button><button id="deleteBtn" class="btn danger hidden">წაშლა</button></div>
@@ -97,7 +97,7 @@ input,textarea,select{width:100%;border:1px solid #35515d;background:#10232c;col
 (() => {
 const cfg=window.TRIP_ADMIN_CONFIG||{};
 const $=id=>document.getElementById(id);
-let sb=null,map=null,marker=null,editingId=null,placesCache=[];
+let sb=null,map=null,marker=null,editingId=null,placesCache=[],selectedImageFile=null,currentImageUrl=null,removeCurrentImage=false;
 
 function msg(el,t,err=false){el.textContent=t||'';el.style.color=err?'#ff909b':'#9fb0b7'}
 function validConfig(){return cfg.supabaseUrl&&cfg.supabaseAnonKey&&cfg.mapboxToken&&!cfg.supabaseUrl.includes('PASTE_')&&!cfg.supabaseAnonKey.includes('PASTE_')&&!cfg.mapboxToken.includes('PASTE_')}
@@ -144,16 +144,44 @@ async function searchMap(){
     [...box.children].forEach((el,i)=>el.addEventListener('click',()=>{const f=d.features[i],c=f.geometry.coordinates,p=f.properties||{};if(!$('nameKa').value.trim())$('nameKa').value=p.name||'';setPoint(c[1],c[0],true);box.innerHTML=''}));
   }catch(e){box.innerHTML='<div class="result">ძებნა ვერ შესრულდა.</div>'}
 }
+function showImagePreview(url){
+  const box=$('imagePreview'),img=$('imagePreviewImg');
+  if(url){img.src=url;box.classList.add('show')}else{img.removeAttribute('src');box.classList.remove('show')}
+}
+function onImageSelected(){
+  const file=$('imageFile').files?.[0]||null;
+  selectedImageFile=file;removeCurrentImage=false;
+  if(!file){showImagePreview(currentImageUrl);return}
+  if(!file.type.startsWith('image/')){msg($('formStatus'),'აირჩიე სურათის ფაილი.',true);$('imageFile').value='';selectedImageFile=null;return}
+  if(file.size>8*1024*1024){msg($('formStatus'),'სურათი 8 MB-ზე დიდი არ უნდა იყოს.',true);$('imageFile').value='';selectedImageFile=null;return}
+  showImagePreview(URL.createObjectURL(file));
+}
+function removeImage(){
+  selectedImageFile=null;currentImageUrl=null;removeCurrentImage=true;$('imageFile').value='';showImagePreview(null);
+}
+function safeFileName(name){return String(name||'image').toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').slice(-80)||'image'}
+async function uploadSelectedImage(){
+  if(!selectedImageFile)return removeCurrentImage?null:currentImageUrl;
+  msg($('formStatus'),'სურათი იტვირთება...');
+  const ext=(selectedImageFile.name.split('.').pop()||'jpg').toLowerCase();
+  const id=(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2));
+  const path=`places/${id}-${safeFileName(selectedImageFile.name.replace(/\.[^.]+$/,''))}.${ext}`;
+  const {error}=await sb.storage.from('place-images').upload(path,selectedImageFile,{cacheControl:'3600',upsert:false,contentType:selectedImageFile.type||undefined});
+  if(error)throw new Error('სურათის ატვირთვა ვერ მოხერხდა: '+error.message);
+  const {data}=sb.storage.from('place-images').getPublicUrl(path);
+  return data?.publicUrl||null;
+}
 function readForm(){
   const lat=Number($('lat').value),lng=Number($('lng').value);
   if(!$('nameKa').value.trim())throw new Error('სახელი სავალდებულოა.');
   if(!Number.isFinite(lat)||!Number.isFinite(lng))throw new Error('აირჩიე მდებარეობა რუკაზე.');
-  return {name_ka:$('nameKa').value.trim(),name_en:$('nameEn').value.trim()||null,category:$('category').value,latitude:lat,longitude:lng,description:$('description').value.trim()||null,image_url:$('imageUrl').value.trim()||null,visit_duration_min:Number($('durationMin').value)||0,rating:Number($('rating').value)||null,active:$('active').value==='true',updated_at:new Date().toISOString()}
+  return {name_ka:$('nameKa').value.trim(),name_en:$('nameEn').value.trim()||null,category:$('category').value,latitude:lat,longitude:lng,description:$('description').value.trim()||null,visit_duration_min:Number($('durationMin').value)||0,rating:Number($('rating').value)||null,active:$('active').value==='true',updated_at:new Date().toISOString()}
 }
 async function savePlace(){
   msg($('formStatus'),'ინახება...');
   try{
     const payload=readForm();
+    payload.image_url=await uploadSelectedImage();
     const res=editingId?await sb.from('interesting_places').update(payload).eq('id',editingId):await sb.from('interesting_places').insert({...payload,created_at:new Date().toISOString()});
     if(res.error)throw res.error;
     msg($('formStatus'),editingId?'ადგილი განახლდა.':'ადგილი დაემატა.');
@@ -168,7 +196,7 @@ async function deletePlace(){
 }
 function clearForm(){
   editingId=null;$('formTitle').textContent='ახალი ადგილის დამატება';$('deleteBtn').classList.add('hidden');
-  ['nameKa','nameEn','description','imageUrl','lat','lng'].forEach(id=>$(id).value='');
+  ['nameKa','nameEn','description','lat','lng'].forEach(id=>$(id).value='');$('imageFile').value='';selectedImageFile=null;currentImageUrl=null;removeCurrentImage=false;showImagePreview(null);
   $('category').value='viewpoint';$('durationMin').value='45';$('rating').value='4.5';$('active').value='true';
   if(marker){marker.remove();marker=null}
 }
@@ -186,10 +214,10 @@ function renderList(){
 function editPlace(id){
   const p=placesCache.find(x=>String(x.id)===String(id));if(!p)return;
   editingId=p.id;$('formTitle').textContent='ადგილის რედაქტირება';$('deleteBtn').classList.remove('hidden');
-  $('nameKa').value=p.name_ka||'';$('nameEn').value=p.name_en||'';$('category').value=p.category||'viewpoint';$('lat').value=p.latitude;$('lng').value=p.longitude;$('description').value=p.description||'';$('imageUrl').value=p.image_url||'';$('durationMin').value=p.visit_duration_min||45;$('rating').value=p.rating||4.5;$('active').value=String(p.active!==false);
+  $('nameKa').value=p.name_ka||'';$('nameEn').value=p.name_en||'';$('category').value=p.category||'viewpoint';$('lat').value=p.latitude;$('lng').value=p.longitude;$('description').value=p.description||'';currentImageUrl=p.image_url||null;selectedImageFile=null;removeCurrentImage=false;$('imageFile').value='';showImagePreview(currentImageUrl);$('durationMin').value=p.visit_duration_min||45;$('rating').value=p.rating||4.5;$('active').value=String(p.active!==false);
   setPoint(Number(p.latitude),Number(p.longitude),true);
 }
-$('loginBtn').addEventListener('click',login);$('logoutBtn').addEventListener('click',logout);$('saveBtn').addEventListener('click',savePlace);$('deleteBtn').addEventListener('click',deletePlace);$('clearBtn').addEventListener('click',clearForm);$('refreshBtn').addEventListener('click',loadPlaces);$('listSearch').addEventListener('input',renderList);$('mapSearchBtn').addEventListener('click',searchMap);$('mapSearchInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchMap()}});
+$('loginBtn').addEventListener('click',login);$('logoutBtn').addEventListener('click',logout);$('saveBtn').addEventListener('click',savePlace);$('deleteBtn').addEventListener('click',deletePlace);$('clearBtn').addEventListener('click',clearForm);$('refreshBtn').addEventListener('click',loadPlaces);$('listSearch').addEventListener('input',renderList);$('mapSearchBtn').addEventListener('click',searchMap);$('mapSearchInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchMap()}});$('imageFile').addEventListener('change',onImageSelected);$('removeImageBtn').addEventListener('click',removeImage);
 init();
 })();
 </script>
