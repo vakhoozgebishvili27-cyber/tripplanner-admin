@@ -218,10 +218,10 @@ async function squareImageFromUrl(url){
   }
   if(!blob.type.startsWith('image/'))throw new Error('URL სურათს არ აბრუნებს.');
   const bmp=await createImageBitmap(blob);
-  const size=900,side=Math.min(bmp.width,bmp.height),sx=(bmp.width-side)/2,sy=(bmp.height-side)/2;
+  const size=500,side=Math.min(bmp.width,bmp.height),sx=(bmp.width-side)/2,sy=(bmp.height-side)/2;
   const canvas=document.createElement('canvas');canvas.width=size;canvas.height=size;
   canvas.getContext('2d').drawImage(bmp,sx,sy,side,side,0,0,size,size);bmp.close?.();
-  const out=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('სურათის დამუშავება ვერ მოხერხდა.')),'image/webp',0.84));
+  const out=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('სურათის დამუშავება ვერ მოხერხდა.')),'image/webp',0.78));
   return out;
 }
 async function uploadImportedImage(url,name){
