@@ -208,21 +208,27 @@ function isDuplicateImport(p){
   return placesCache.some(x=>(x.name_ka||'').trim().toLocaleLowerCase('ka')===n&&Math.abs(Number(x.latitude)-p.latitude)<0.00015&&Math.abs(Number(x.longitude)-p.longitude)<0.00015);
 }
 async function squareImageFromUrl(url){
-  const {data,error}=await sb.functions.invoke('image-proxy',{body:{url}});
-  if(error)throw new Error('სურათის ჩამოტვირთვა ვერ მოხერხდა: '+(error.message||String(error)));
-  let blob=data;
-  if(!(blob instanceof Blob)){
-    if(data instanceof ArrayBuffer)blob=new Blob([data]);
-    else if(ArrayBuffer.isView(data))blob=new Blob([data.buffer]);
-    else throw new Error('სერვერმა სურათის ფაილი არ დააბრუნა.');
+  const sessionResult=await sb.auth.getSession();
+  const session=sessionResult.data.session;
+  if(!session)throw new Error('Please sign in again before importing images.');
+  const proxyUrl=cfg.supabaseUrl+'/functions/v1/image-proxy';
+  const r=await fetch(proxyUrl,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token,'apikey':cfg.supabaseAnonKey},
+    body:JSON.stringify({url:url})
+  });
+  if(!r.ok){
+    let detail='HTTP '+r.status;
+    try{const d=await r.json();if(d && d.error)detail=d.error}catch(e){}
+    throw new Error('Image download failed: '+detail);
   }
-  if(!blob.type.startsWith('image/'))throw new Error('URL სურათს არ აბრუნებს.');
+  const blob=await r.blob();
+  if(!blob.type.startsWith('image/'))throw new Error('The proxy did not return an image.');
   const bmp=await createImageBitmap(blob);
   const size=500,side=Math.min(bmp.width,bmp.height),sx=(bmp.width-side)/2,sy=(bmp.height-side)/2;
   const canvas=document.createElement('canvas');canvas.width=size;canvas.height=size;
   canvas.getContext('2d').drawImage(bmp,sx,sy,side,side,0,0,size,size);bmp.close?.();
-  const out=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('სურათის დამუშავება ვერ მოხერხდა.')),'image/webp',0.78));
-  return out;
+  return await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('Image processing failed.')),'image/webp',0.78));
 }
 async function uploadImportedImage(url,name){
   if(!url)return null;
