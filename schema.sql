@@ -9,7 +9,7 @@ create table if not exists public.interesting_places (
   id uuid primary key default gen_random_uuid(),
   name_ka text not null,
   name_en text,
-  category text not null check (category in ('viewpoint','historic','fishing','camping','food')),
+  category text not null check (category in ('viewpoint','historic','fishing','camping','food','picnic','nature','waterfall','lake','monastery','castle','cave','museum','hotel','gas_station','rest_area','beach','winery')),
   latitude double precision not null check (latitude between -90 and 90),
   longitude double precision not null check (longitude between -180 and 180),
   description text,
@@ -68,3 +68,9 @@ on public.admin_users
 for select
 to authenticated
 using (user_id = auth.uid());
+
+
+-- Run this migration once on existing databases created with an older category list.
+alter table public.interesting_places drop constraint if exists interesting_places_category_check;
+alter table public.interesting_places add constraint interesting_places_category_check
+check (category in ('viewpoint','historic','fishing','camping','food','picnic','nature','waterfall','lake','monastery','castle','cave','museum','hotel','gas_station','rest_area','beach','winery'));
