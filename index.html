@@ -208,9 +208,14 @@ function isDuplicateImport(p){
   return placesCache.some(x=>(x.name_ka||'').trim().toLocaleLowerCase('ka')===n&&Math.abs(Number(x.latitude)-p.latitude)<0.00015&&Math.abs(Number(x.longitude)-p.longitude)<0.00015);
 }
 async function squareImageFromUrl(url){
-  const r=await fetch(url,{mode:'cors'});
-  if(!r.ok)throw new Error('სურათის ჩამოტვირთვა ვერ მოხერხდა (HTTP '+r.status+').');
-  const blob=await r.blob();
+  const {data,error}=await sb.functions.invoke('image-proxy',{body:{url}});
+  if(error)throw new Error('სურათის ჩამოტვირთვა ვერ მოხერხდა: '+(error.message||String(error)));
+  let blob=data;
+  if(!(blob instanceof Blob)){
+    if(data instanceof ArrayBuffer)blob=new Blob([data]);
+    else if(ArrayBuffer.isView(data))blob=new Blob([data.buffer]);
+    else throw new Error('სერვერმა სურათის ფაილი არ დააბრუნა.');
+  }
   if(!blob.type.startsWith('image/'))throw new Error('URL სურათს არ აბრუნებს.');
   const bmp=await createImageBitmap(blob);
   const size=900,side=Math.min(bmp.width,bmp.height),sx=(bmp.width-side)/2,sy=(bmp.height-side)/2;
