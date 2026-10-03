@@ -246,20 +246,31 @@ async function bulkImport(){
   let rows;
   try{rows=JSON.parse(await file.text());if(!Array.isArray(rows))throw new Error('JSON-ის ზედა დონე უნდა იყოს მასივი [ ... ].')}
   catch(e){msg($('bulkStatus'),'JSON ვერ გაიხსნა: '+e.message,true);$('bulkImportBtn').disabled=false;return}
-  let ok=0,skipped=0,failed=0;const errors=[];
+  let ok=0,skipped=0,failed=0,imageSkipped=0;const errors=[],imageWarnings=[];
   for(let i=0;i<rows.length;i++){
     try{
       const p=normalizeImportRow(rows[i],i);
       if(isDuplicateImport(p)){skipped++;continue}
-      const image_url=await uploadImportedImage(p.imageSource,p.name_en||p.name_ka);
+      let image_url=null;
+      if(p.imageSource){
+        try{image_url=await uploadImportedImage(p.imageSource,p.name_en||p.name_ka)}
+        catch(imageError){
+          imageSkipped++;
+          imageWarnings.push(`#${i+1} ${p.name_en||p.name_ka}: ${imageError.message||String(imageError)}`);
+          image_url=null;
+        }
+      }
       const payload={name_ka:p.name_ka,name_en:p.name_en,category:p.category,latitude:p.latitude,longitude:p.longitude,description:p.description,image_url,visit_duration_min:p.visit_duration_min,rating:p.rating,active:p.active,created_at:new Date().toISOString(),updated_at:new Date().toISOString()};
       const {data,error}=await sb.from('interesting_places').insert(payload).select().single();
       if(error)throw error;if(data)placesCache.unshift(data);ok++;
     }catch(e){failed++;errors.push(`#${i+1}: ${e.message||String(e)}`)}
     $('bulkProgressBar').style.width=Math.round(((i+1)/rows.length)*100)+'%';
-    $('bulkStatus').textContent=`დამუშავებულია ${i+1}/${rows.length}\nდამატებულია: ${ok} • გამოტოვებულია: ${skipped} • შეცდომა: ${failed}`;
+    $('bulkStatus').textContent=`დამუშავებულია ${i+1}/${rows.length}\nდამატებულია: ${ok} • დუბლიკატი: ${skipped} • სურათი გამოტოვებულია: ${imageSkipped} • ადგილის შეცდომა: ${failed}`;
   }
-  $('bulkErrors').textContent=errors.slice(0,30).join('\n')+(errors.length>30?`\n... კიდევ ${errors.length-30} შეცდომა`:'');
+  const parts=[];
+  if(errors.length)parts.push('ადგილის შეცდომები:\n'+errors.slice(0,30).join('\n')+(errors.length>30?`\n... კიდევ ${errors.length-30} შეცდომა`:''));
+  if(imageWarnings.length)parts.push('სურათები, რომლებიც ვერ ჩამოიტვირთა (ადგილები მაინც დაემატა):\n'+imageWarnings.slice(0,30).join('\n')+(imageWarnings.length>30?`\n... კიდევ ${imageWarnings.length-30} სურათი`:''));
+  $('bulkErrors').textContent=parts.join('\n\n');
   $('bulkImportBtn').disabled=false;await loadPlaces();
 }
 
